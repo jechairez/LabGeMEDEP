@@ -1,7 +1,7 @@
 **Author(s)**: José Luis Caldú Primo, José Dávila Velderrain    
 **Short description (80 characters)**: R functions to analyze network robustness to node removal (attacks/errors)  
-**Project**: [[|]]   
-**Code**: [[|]]   
+**Project**: [[PropiedadesSubyacentesTroncalidad-JLC|PropiedadesSubyacentesTroncalidad-JLC]]   
+**Code**: [[Error_attack_functions|Error_attack_functions]]   
 **License**: [[GNU GPL v.3.0|https://github.com/LabGeMEDEP/LabGeMEDEP/blob/master/LICENSE]]   
 **Language (with version)**: R 3.3.2  
 **Dependencies**: igraph, Matrix, psych   
