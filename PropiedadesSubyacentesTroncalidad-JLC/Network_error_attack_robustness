@@ -1,0 +1,50 @@
+**Author(s)**: José Luis Caldú Primo, José Dávila Velderrain    
+**Short description (80 characters)**: R functions to analyze network robustness to node removal (attacks/errors)  
+**Project**: [[|]]   
+**Code**: [[|]]   
+**License**: [[GNU GPL v.3.0|https://github.com/LabGeMEDEP/LabGeMEDEP/blob/master/LICENSE]]   
+**Language (with version)**: R 3.3.2  
+**Dependencies**: igraph, Matrix, psych   
+
+
+## Description
+These functions measure a network's structural robustness based on the idea that disabling a substantial number of nodes will result in an inevitable functional disintegration of a network. Robustness to errors is measured after the removal of randomly selected nodes from the networks; robustness to attacks is measured after the removal of nodes from higher to lower node degree. The topological features measured to characterize the behavior of both errors and attacks are the decrease in the giant component size and the decrease in the network efficiency.
+
+### Inputs 
+Depending on function:
+*Giant.component.size / Efficiency	*Network in igraph format
+
+*Attack.Behavior / Error.behavior 	*Network in igraph format
+		                  							*Feature to measure ("efficiency" or "giantcomponent" or "all")
+
+*Error.Attack.Behavior 		*Network in igraph format
+          						    *Feature to measure ("efficiency" or "giantcomponent" or "all")
+					          	    *Number of iterations to calculate error behavior 	
+
+
+### Outputs
+Depending on function:
+*Giant.component.size / Efficiency	*Value of the topological feature for the given network.
+
+*Attack.Behavior / Error.behavior 	*Vector of relative value of the selected feature for all the attacked/damaged networks. 
+
+*Error.Attack.Behavior 		*Vector of relative value of the selected feature for all the attacked networks, and matrix with the error behavior for every iteration.
+          						  
+### Functions (optional)
+*Giant.component.size	Calculate network's giant component size
+*Efficiency 	Calculate network's efficiency
+*Attack.Behavior 	Generate attacked networks and calculate the given feature
+*Error.Behavior		Generate damaged networks and calculate the given feature
+*Error.Attack.Behavior		Iterate calculation of error behavior a given number of times, calculate attack behavior and error-attack deviation
+
+### Examples
+
+### Exceptions and special cases (optional)
+
+### Errors (optional)
+
+
+## Related code (optional)
+
+
+## Others (optional)
