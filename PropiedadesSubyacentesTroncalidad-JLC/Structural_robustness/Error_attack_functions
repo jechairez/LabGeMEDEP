@@ -1,0 +1,104 @@
+####################################################################################################################################################################
+Giant.component.size <- function(Graph) {
+  cl <- components(Graph) 
+  return(cl$csize[which.max(cl$csize)])
+}
+####################################################################################################################################################################
+Efficiency <- function(net){
+  #net <- NETS[[1]]
+  paths <- shortest.paths(net)
+  diag(paths) = NA
+  E <- 1/harmonic.mean(as.vector(paths))
+  return(E)
+}
+####################################################################################################################################################################
+Attack.Behavior<-function(Graph,feature="all"){ ## Features {"efficiency" or "giantcomponent" or "all"}
+  ## Generate Attacked Networks
+  Cuantos <- round(vcount(Graph)*seq(0,.99, 0.01))[-1]  ## Vector with number of vertices to remove, going from 1% to 100%
+      
+  NETS.Attack <- list() ## list of attacked networks
+  NET.Attack.Order <- order(degree(Graph), decreasing = TRUE) ## order of node removal (decreasing degree)
+  
+  for(i in 1:length(Cuantos)) {
+    NETS.Attack[[i]] <- delete.vertices(Graph, NET.Attack.Order[1:Cuantos[i]]) ## create attacked networks with 1% to 100% of removed vertex
+  } 
+  ## Calculate attack features
+  if(feature=="all"){
+    NET.Attack.Behavior <- cbind(E = unlist(sapply(NETS.Attack, Efficiency)/Efficiency(Graph)), ## calculate relative Efficiency of every attacked net
+                                 S = unlist(sapply(NETS.Attack, Giant.component.size)/Giant.component.size(Graph)), ## calculate relative Giant Component Size of every attacked net
+    rm(NETS.Attack)       
+  }
+  if(feature=="efficiency"){  
+    NET.Attack.Behavior <- unlist(sapply(NETS.Attack, Efficiency))/Efficiency(Graph)  ## calculate relative Efficiency of every attacked net
+    rm(NETS.Attack)
+  }
+  if(feature=="giantcomponent"){
+    NET.Attack.Behavior <- unlist(sapply(NETS.Attack, Giant.component.size))/Giant.component.size(Graph) ## calculate relative Giant Component Size of every attacked net
+    rm(NETS.Attack)      
+  }
+  return(NET.Attack.Behavior)
+}
+####################################################################################################################################################################
+Error.Behavior <- function(Graph,feature="all"){ ## Features {"efficiency" or "giantcomponent" or  "all"}
+  ## Generate Damaged Networks
+    Cuantos <- round(vcount(Graph)*seq(0,.99, 0.01))[-1]
+    NETS.Damaged <- list()
+    for(i in 1:length(Cuantos)) { ## create damaged networks with 1% to 100% of removed vertex
+      NETS.Damaged[[i]] <- delete.vertices(Graph, sample(1:vcount(Graph), Cuantos[i]))
+    }
+  
+  ## Calculate error Features
+  if(feature=="all"){
+    NET.Error.Behavior <- cbind(E = unlist(sapply(NETS.Damaged, Efficiency)/Efficiency(Graph)), ## calculate relative Efficiency of every damaged net
+                                S = unlist(sapply(NETS.Damaged, Giant.component.size)/Giant.component.size(Graph)), ## calculate relative Giant Component Size of every damaged net
+    rm(NETS.Damaged)      
+  }
+    
+  if(feature=="efficiency"){
+    NET.Error.Behavior <- unlist(sapply(NETS.Damaged, Efficiency))/Efficiency(Graph) ## calculate relative Efficiency of every damaged net
+    rm(NETS.Damaged)  
+  }
+
+  if(feature=="giantcomponent"){
+    NET.Error.Behavior <- unlist(sapply(NETS.Damaged, Giant.component.size))/Giant.component.size(Graph) ## calculate relative Giant Component Size of every damaged net
+    rm(NETS.Damaged)
+  }
+
+  return(NET.Error.Behavior)
+}
+####################################################################################################################################################################
+Error.Attack.Behavior <- function(Graph,errorIter=1000,feature="all"){ ## Features="efficiency" or "giantcomponent" or "dissimilarity" or "all"
+  if(feature=="all")  {
+    # Attack
+    Attack <- Attack.Behavior(Graph,feature)
+
+    # Error
+    All.Error <- lapply(1:errorIter, function(i) Error.Behavior(Graph,feature))
+    Error.E<-matrix(0,ncol=errorIter,nrow=99)
+    Error.S<-matrix(0,ncol=errorIter,nrow=99)
+    for (i in 1:errorIter) {
+      Error.E[,i] <- All.Error [[i]][,1]
+      Error.S[,i] <- All.Error [[i]][,2]
+    }
+    Error=list(E=Error.E,S=Error.S)
+
+    # Error-Attack deviation
+    
+    EAdev <- c(E = sqrt((sum((rowMeans(Error.E) - Attack[,1])^2))/99), 
+               S = sqrt((sum((rowMeans(Error.S) - Attack[,2])^2))/99),
+  }
+
+  if(feature == "efficiency" | feature == "giantcomponent"){
+      # Attack
+      Attack <- Attack.Behavior(Graph,feature)
+  
+      # Error
+      Error <- sapply(1:errorIter, function(i) Error.Behavior(Graph,feature))
+      
+      # Error-Attack deviation
+      EAdev <- sqrt((sum((rowMeans(Error) - Attack)^2))/99)
+  }
+
+  return(list(attack=Attack, error=Error, EAD=EAdev))  
+}
+####################################################################################################################################################################
