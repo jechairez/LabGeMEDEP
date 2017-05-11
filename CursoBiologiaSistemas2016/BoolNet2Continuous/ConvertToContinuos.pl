@@ -2,7 +2,7 @@
 
 #################################################################################################################################
 # Developed by: Juan Antonio Arias Del Angel 
-# Last version: 1.0 (November 26th 2016)
+# Last version: 1.1 (May 8th 2017)
 # Contact: jariasdelangel@gmail.com
 #
 #
@@ -11,8 +11,9 @@
 # Input: The program takes 3 arguments as input. 
 #
 # (1) The first argument is a plain text file containing a boolean network encoded according to R-library BoolNet specifications. 
-# (2) A string specificating the type of fuzzy logic which will be employed to generate a continuous model. 'Fuzzy' specifies Zadeh's logic based in max and min functions and 'Probabilistic' is based in sums and multiplications. 
-# (3) A string specificating the type of equation employed to describe the rate of change. "CarlosVillarreal" and "LuisMendoza" specifies for the equations proposed by Villarreal et al. 2012 and Ortíz-Gutierrez et al., 2015, respecitvely. 
+# (2) A string specificating the type of fuzzy logic which will be employed to generate a continuous model. 'Zadeh' specifies Zadeh's logic based in max and min functions and 'Probabilistic' is based in sums and multiplications. 
+# (3) A string specificating the type of equation employed to describe the rate of change. "Villarreal" and "SQUAD" specifies for the equations showed by Villarreal et al. 2012 and Ortíz-Gutierrez et al., 2015, respecitvely. 
+# (4) A string specificating the separator character between targets and factos as used in the BoolNet format. 
 ################################################################################################################################
 
 use strict;
@@ -27,10 +28,12 @@ my $BoolFunc;
 
 my $logic = $ARGV[1];
 my $equation = $ARGV[2];
-my $mode = $ARGV[3];
+my $sep = $ARGV[3];
 ######################################################
 
-# Get the information about the Boolean network stored in the input file. 
+# Read the BoolNet file and stores the lines.
+# Particularly in line 44 the whitespaces are eliminated. 
+
 while(<net>){
     
     if(!/targets/ && !/\#/){
@@ -49,17 +52,16 @@ while(<net>){
 
 ######################################################
 my @BoolFunc;
-my $LuisMendoza = "dX = ((-exp(0.5*h)+exp(-h*(w_X)))/((1-exp(0.5*h))*(1+exp(-h*(w_X-0.5)))))-(alphaX*X)";
-my $CarlosVillarreal = "dX = 1/(1+(exp(-2*b*(w_X-h)))) - (alphaX*X)";
+my $squad = "dX = ((-exp(0.5*h)+exp(-h*(w_X)))/((1-exp(0.5*h))*(1+exp(-h*(w_X-0.5)))))-(alphaX*X)";
+my $villarreal = "dX = 1/(1+(exp(-2*b*(w_X-h)))) - (alphaX*X)";
 my $eq = ();
 my @nodes = ();
 ######################################################
 # Print the beginning of the R function to simulate the continuous model as employed in R-library deSolve.
 
-if($mode eq 'Deterministic'){
-    print("network = function(t, state, parameters) {\n");
-    print("\twith(as.list(c(state, parameters)),{\n");
-}
+print("network = function(t, state, parameters) {\n");
+print("\twith(as.list(c(state, parameters)),{\n");
+
 
 
 ############################################################################################################
@@ -69,11 +71,11 @@ print("\t\t\# Input Nodes\n");
 # According to the parameter chosen. The inputs nodes are specified according to fuzzy or probabilistic logic.
 
 
-if($logic eq 'Fuzzy'){
+if($logic eq 'Zadeh'){
 
 
     for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
-        @BoolFunc = split(',', $BooleanNetwork[$BoolFunc]);
+        @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
         my $characters = length($BoolFunc[1]);
 
         my $FuzzyExpression = &getFuzzyContent($BoolFunc[1], 0);
@@ -87,7 +89,7 @@ if($logic eq 'Fuzzy'){
 if($logic eq 'Probabilistic'){
 
     for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
-        @BoolFunc = split(',', $BooleanNetwork[$BoolFunc]);
+        @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
         my $characters = length($BoolFunc[1]);
 
         my $FuzzyExpression = &getProbabilisticContent($BoolFunc[1], 0);
@@ -97,48 +99,36 @@ if($logic eq 'Probabilistic'){
 
     }
 }
+
 ############################################################################################################
 ############################################################################################################
 print "\n\n";
 
-if($mode eq 'Deterministic'){
-    # According to the parameter chosen. The rates of changes are specified according to Villarreal or Mendoza. 
-    print("\t\t\# Rates of Change\n");
-    if($equation eq 'LuisMendoza'){
-        for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
-            $eq = $LuisMendoza;
-            @BoolFunc = split(',', $BooleanNetwork[$BoolFunc]);
-            $eq =~ s/X/$BoolFunc[0]/g;
-            print "\t\t$eq\n";
+print("\t\t\# Rates of Change\n");
+if($equation eq 'SQUAD'){
+    for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
+        $eq = $squad;
+        @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
+        $eq =~ s/X/$BoolFunc[0]/g;
+        print "\t\t$eq\n";
 
-            push(@nodes, 'd' . $BoolFunc[0]);
-        }
-    }
-
-    if($equation eq 'CarlosVillarreal'){
-        for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
-            $eq = $CarlosVillarreal;
-            @BoolFunc = split(',', $BooleanNetwork[$BoolFunc]);
-            $eq =~ s/X/$BoolFunc[0]/g;
-            print "\t\t$eq\n";
-
-            push(@nodes, 'd' . $BoolFunc[0]);
-        }
+        push(@nodes, 'd' . $BoolFunc[0]);
     }
 }
 
-if($mode eq 'Stochastic'){
-    print "\n\n\t\t\# Add noise\n";
-    foreach my $node (@nodes){
-        print "\t\t$node = $node + intensity*sqrt(dt)*rnorm(1)\n";
-        print "\t\tif($node < 0) $node = 0\n";
-        print "\t\tif($node > 1) $node = 1\n";
+if($equation eq 'Villarreal'){
+    for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
+        $eq = $villarreal;
+        @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
+        $eq =~ s/X/$BoolFunc[0]/g;
+        print "\t\t$eq\n";
+
+        push(@nodes, 'd' . $BoolFunc[0]);
     }
 }
 
 ############################################################################################################
 ############################################################################################################
-
 # Print the last of the R function to simulate the continuous model as employed in R-library deSolve
 
 my $nodes = join(',', @nodes);

@@ -1,6 +1,3 @@
-library(BoolNet)
-library(deSolve)
-
 #################################################################################################################################
 # This file contains R functions intented to be useful while performing Epigenetic Landscape analysis over BoolNet networks.
 # The functions have been tested over limited examples so any correction or suggestion is welcome. 
@@ -25,27 +22,22 @@ library(deSolve)
 # IMPORTANT: This function call the perl script "ConvertTocontinuos.pl". For now, such script must be located in the same directory that the R working directory. 
 # Arguments:
 # (1) net a file containing a BoolNet network.
-# (2) logic is a character string specificating either if Fuzzy (i.e., Zadeh's logic) or Probabilistic logic is employed during the translation. Default: Fuzzy.
+# (2) logic is a character string specificating either if Zadeh or Probabilistic logic is employed during the translation. Default: Zadeh.
 # (3) eq is a character string specificating either if the equation proposed by Sanchez-Corrales et al., 2010 or Villarreal et al., 2012 is employed by describe the rate of change for the nodes in the network. 
 
-BoolToContinuous = function(net, logic = "Fuzzy", eq = "LuisMendoza", mode = "Deterministic"){
-    if(logic != "Fuzzy" && logic != "Probabilistic"){
+BoolNet2ToContinuous = function(net, logic = "Zadeh", eq = "SQUAD", sep = ","){
+    if(logic != "Zadeh" && logic != "Probabilistic"){
         stop(paste("Invalid logic value: logic must be either 'Fuzzy' or 'Probabilistic' "))
     }
-    if(eq != "LuisMendoza" && eq != "CarlosVillarreal"){
+    if(eq != "SQUAD" && eq != "Villarreal"){
         stop(paste("Invalid eq value: eq must be either 'LuisMendoza' or 'CarlosVillarreal' "))
     }
-    if(mode != "Deterministic" && mode != "Stochastic"){
-        stop(paste("Invalid mode value: mode must be either 'Deterministic' or 'Stochastic' "))
-    }
-    cmd = paste("perl", "ConvertToContinuos.pl", net, logic, eq, mode, "> cont.r")
+
+    cmd = paste("perl", "ConvertToContinuos.pl", net, logic, eq, sep, "> cont.r")
     system(cmd)
     source("cont.r")
+    system("rm cont.r")
     return(network)
     
 }
 
-
-### Agregar que cheque si el archivo existe
-### Agregar sep = "" y poner como default a la ",".
-### Cambiar 'LuisMendoza' por 'SQUAD'
