@@ -25,15 +25,26 @@
 # (2) logic is a character string specificating either if Zadeh or Probabilistic logic is employed during the translation. Default: Zadeh.
 # (3) eq is a character string specificating either if the equation proposed by Sanchez-Corrales et al., 2010 or Villarreal et al., 2012 is employed by describe the rate of change for the nodes in the network. 
 
-BoolNet2ToContinuous = function(net, logic = "Zadeh", eq = "SQUAD", sep = ","){
+BoolNet2ToContinuous = function(net, logic = "Zadeh", eq = "SQUAD", sep = ",", mutants = c(), keep.input = FALSE){
     if(logic != "Zadeh" && logic != "Probabilistic"){
         stop(paste("Invalid logic value: logic must be either 'Fuzzy' or 'Probabilistic' "))
     }
     if(eq != "SQUAD" && eq != "Villarreal"){
         stop(paste("Invalid eq value: eq must be either 'LuisMendoza' or 'CarlosVillarreal' "))
     }
+    
+    if(length(mutants) != 0){
+        mutants = paste(mutants, sep = ",", collapse = ",")
+    } else {
+        mutants = "."
+    }
+    if(keep.input){
+        input = "1"
+    } else{
+        input = "0"
+    }
 
-    cmd = paste("perl", "ConvertToContinuos.pl", net, logic, eq, sep, "> cont.r")
+    cmd = paste("perl", "ConvertToContinuos.pl", net, logic, eq, sep, mutants, input, "> cont.r")
     system(cmd)
     source("cont.r")
     system("rm cont.r")

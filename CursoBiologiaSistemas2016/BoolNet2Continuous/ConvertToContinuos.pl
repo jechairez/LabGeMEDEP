@@ -2,7 +2,7 @@
 
 #################################################################################################################################
 # Developed by: Juan Antonio Arias Del Angel 
-# Last version: 1.1 (May 8th 2017)
+# Last version: 1.2 (May 17th 2017)
 # Contact: jariasdelangel@gmail.com
 #
 #
@@ -29,6 +29,9 @@ my $BoolFunc;
 my $logic = $ARGV[1];
 my $equation = $ARGV[2];
 my $sep = $ARGV[3];
+my $mutants = $ARGV[4];
+my $input = $ARGV[5];
+
 ######################################################
 
 # Read the BoolNet file and stores the lines.
@@ -53,9 +56,11 @@ while(<net>){
 ######################################################
 my @BoolFunc;
 my $squad = "dX = ((-exp(0.5*h)+exp(-h*(w_X)))/((1-exp(0.5*h))*(1+exp(-h*(w_X-0.5)))))-(alphaX*X)";
-my $villarreal = "dX = 1/(1+(exp(-2*b*(w_X-h)))) - (alphaX*X)";
+my $villarreal = "dX = 1/(1+(exp(-2*h*(w_X-b)))) - (alphaX*X)";
 my $eq = ();
 my @nodes = ();
+$mutants = '-' . $mutants . '-';
+$mutants =~ s/,/-/g;
 ######################################################
 # Print the beginning of the R function to simulate the continuous model as employed in R-library deSolve.
 
@@ -110,6 +115,12 @@ if($equation eq 'SQUAD'){
         $eq = $squad;
         @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
         $eq =~ s/X/$BoolFunc[0]/g;
+        if((($BoolFunc[0] . '\\') eq $BoolFunc[1]) && $input == 1 ){
+            $eq =~ s/= (.+)/= 0/g;
+        }
+        if(index($mutants, ('-' . $BoolFunc[0] . '-')) != -1){
+            $eq =~ s/= (.+)/= 0/g;
+        }
         print "\t\t$eq\n";
 
         push(@nodes, 'd' . $BoolFunc[0]);
@@ -121,6 +132,15 @@ if($equation eq 'Villarreal'){
         $eq = $villarreal;
         @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
         $eq =~ s/X/$BoolFunc[0]/g;
+        if((($BoolFunc[0] . '\\') eq $BoolFunc[1]) && $input == 1 ){
+            $eq =~ s/= (.+)/= 0/g;
+        }
+        if($BoolFunc[0] =~ /$mutants/){
+            $eq =~ s/= (.+)/= 0/g;
+        }
+        if(index($mutants, ('-' . $BoolFunc[0] . '-')) != -1){
+            $eq =~ s/= (.+)/= 0/g;
+        }
         print "\t\t$eq\n";
 
         push(@nodes, 'd' . $BoolFunc[0]);
@@ -137,7 +157,36 @@ print("\n\n");
 print("\t\tlist(c($nodes))\n");
 print("\t})\n}\n");
 
+# Print a vector containing the default parameters.
+# alphaXi = 1
+# h = 20
+# b = 0.5
 
+print("parameters = c(h = 20, b = 0.5");
+
+for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
+    @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
+    print ", alpha$BoolFunc[0] = 1";
+}
+
+
+print("\)\n\n");
+
+# Print a vector containing the default initial state.
+# Xi = 1
+
+print("state = c(");
+
+for($BoolFunc = 0; $BoolFunc < scalar(@BooleanNetwork); $BoolFunc++){
+    @BoolFunc = split($sep, $BooleanNetwork[$BoolFunc]);
+    if($BoolFunc == 0){
+        print "$BoolFunc[0] = 1"
+    } else {
+        print ", $BoolFunc[0] = 1";
+    }
+}
+
+print("\)\n");
 
 #################################################################################################################################
 #######################                                                                                   #######################
