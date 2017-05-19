@@ -1,0 +1,15 @@
+targets, factors
+APC, !E2Fe & ((E2Fa & !RBR) | MYB3R | MYB77)
+KRP1, (MYB77 | MYB3R) & !(CDKB1 & CYCA2 & SCF)
+CYCA2, !APC & (MYB3R | MYB77)
+CDKB1, ((!RBR | (!KRP1 & CYCD3)) & E2Fb & !E2Fc) | MYB3R | MYB77
+CYCB1, !APC & (MYB3R | MYB77 | ((!RBR | (!KRP1 & CYCD3)) & E2Fb & !E2Fc))
+MYB3R, MYB77 | (MYB3R & CYCB1 & !KRP1)
+MYB77, E2Fb & (!RBR | (!KRP1 & CYCD3))
+E2Fe, (!E2Fc | (E2Fb & (!RBR | (!KRP1 & CYCD3)))) | MYB77
+E2Fc, !(SCF & !KRP1 & CYCD3) & ((E2Fa & !RBR) | MYB3R)
+E2Fb, (E2Fa & !RBR)
+E2Fa, (E2Fa | !E2Fc) & !(CDKB1 & CYCA2)
+RBR, (KRP1 | !CYCD3) & ((E2Fa & !RBR) | MYB3R)
+SCF, !APC & ((E2Fb & (!RBR | (!KRP1 & CYCD3))) | MYB3R)
+CYCD3, !SCF
