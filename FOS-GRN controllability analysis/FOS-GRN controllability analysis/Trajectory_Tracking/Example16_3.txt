@@ -1,0 +1,2 @@
+MD ME x1 x2 u1
+MC MN x1 u2

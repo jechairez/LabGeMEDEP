@@ -1,0 +1,43 @@
+This folder contains:
+
+1. Boolean algebra operations (Complete)
+   This folder contains matlab codes for Boolean operations (needed most of the cases for controllability matrix calculation) such as:
+   -Bpower.m              	(Boolean power of a matrix )
+   -Bprod.m 		  	(Boolean product between two matrices)
+   -Bsum.m                	(Boolean sum of two matrices)
+   -Gpower.m              	(Boolean power of matrix g0)
+   -Mcontrol.m            	(Controllability matrix)
+
+2. FOS_GRN_original (Complete)
+   This folder contains a matlab code for algebraic transformation of the boolean network (FOS-GRN) (DOI: 10.1103/PhysRevLett.109.118102):
+   -floral_network.m      	(Algebraic transformation of FOS-GRN)
+   -Logic_Rules_FOS_GRN.txt	(It contains the logic rules associated to FOS-GRN)
+
+3. FOS-GRN_simulation (Complete)
+   This folder contains a matlab code for simulation of the dynamic of FOS-GRN under controls previously calculated by FOS-GRN_trajectories
+   -FOS_GRN_simulation.m  	(Dynamic simulation of FOS-GRN controlled, see an example on Controllability/Results/Images)
+
+4. FOS_GRN_trajectories (Complete)
+   This folder contains matlab codes for the characterization of the reachable sets and controls for FOS-GRN:
+   -FOS_GRN.txt                 (Logic rules in specific format, see format_logicrules.txt)
+   -format_logicrules.txt	(Transformation of logic rules to matlab format)
+   -Manual_code.txt		(It contains a breifly summarize of Main_FOS_GRN.m)
+   -GetAttractors.m		(Calculate structure matrix for each variable)
+   -Main_FOS_GRN.m		(Main code)
+   -ShowAttractors.m		(Get and show on screen Attractor Landscape)
+   -ShowTrajectories.m		(Show available trajectories among attractors under Boolean sequence controls, see an example on Trajectories_a.eps)
+   -SortInfo.m			(Contains a table with available trajectories among attractors without format)
+
+5. FOS_GRN_trajectories_AG_0 (Complete)
+    This folder contains matlab codes for the characterization of the reachable sets and control for FOS-GRN and knock-off of AGAMOUS:
+   -FOS_GRN.txt                 (Logic rules in specific format, see format_logicrules.txt)
+   -GetAttractors.m		(Calculate structure matrix for each variable)
+   -Main_FOS_GRN.m		(Main code)
+   -ShowAttractors.m		(Get and show on screen Attractor Landscape)
+   -ShowTrajectories.m		(Show available trajectories among attractors under Boolean sequence controls, see an example on Trajectories_a.eps)
+   -SortInfo.m			(Contains a table with available trajectories among attractors without format)
+
+6. Trajectory_Tracking (Only for systems which the controllability matrix can be solved)
+   This folder contains matlab codes for trajectory tracking (finding the small trajectory between final and initial condition)
+   -Boolean algebra operations  (Folder with Bolean angebra operations for controllability matrix calculation)
+   -Trajectory_tracking.m       (Iterative computation for trajectory tracking)

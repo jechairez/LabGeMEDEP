@@ -1,0 +1,54 @@
+This program obtains the possible transitions among attractors of a Booleean network through controllability approach.
+Being more specific, this computes the reachable sets of a given attractor manipulating the system via control input.
+Needed inputs (free boolean sequences) for transitions are also computed by the program.
+
+1. Initialization section:
+Initial conditions of some variables and other fixed values are initalized in this part
+
+a) Set the valued logic used in the network (two valued, three-valued, multi-valued).
+b) Set the structure matrices (negation, conjuction, disjunction, etc.)
+c) Initialize variables such as number of nodes (n), control inputs (m), number of steps (s) and others that will be used forward (Do not change).
+d) Define "option" variable which includes all the genes involved on the Boolean network.
+e) Read the archive that contains the network. 
+   **Please check additional information to find how the network must be written in the archive.**
+
+2. Attractors and transition matrix of non-controlled network:
+
+a) Function "GetAttractors" obtains the attractors of the non-controlled network. (Check GetAttractors function on matlab)
+b) Function "ctimes" computes the transition matrix of the system. (Check ctimes function on matlab)
+c) Function "ShowAttractors" displays the attractor landscape. (Check ShowAttractor function on matlab)
+
+3. Transition matrix of controlled-network
+a) The same as 1.d, but in this case adding control input u1. 
+b) Loop 1 is repeated as many times as genes are in the network, in order to switch in every iteration the control input 
+c) Function "strcat" concatenates the logic rule associated to the gene i with a new variable (control input) u1
+d) Function "sprintf" adds a logic operator (MD= disjunction, MC= conjunction) between the logic rule and control input u1 (Defined by the user).
+e) Function "GetAttractors" the same as 2.a
+f) Function "ctimes" the same as 2.b
+ 
+4. Compute Ltilde (Lt)
+a) Variable "Lt" is computed in order to switch the bilinear system from x(t+1)=Lu(t)x(t) into x(t+1)=Ltx(t)u(t) to be able to find the control sequence
+
+5. Get reachability set
+a) Loop 2 is repeated as many times as attractors are, in order to switch it in every iteration the initial condition
+b) Convert the given initial condition as a string (10010101) into a vector form of logic (Check Chapter 3 Matrix expression of logic) 
+c) Find the matrix (Theorem 9.3) which if contains the final condition in its columns, then final condition is reachable through gene i from initial condition
+d) Loop 3 is repeated as many times as attractors are, in order to switch it in every iteration the final condition
+e) Convert the given final condition as a string (10010101) into a vector form of logic (Check Chapter 3 Matrix expression of logic)
+f) Matrices such as jj and tt are defined and also its indexes such as uu and kk, respectively.
+g) Loop 4 is repeated as many times as columns Col_check has, in order to dismiss those repeated columns Col_check may have
+h) Conditional 1 assigns in matrix jj those not repeated columns of Col_check
+i) Conditional 2 checks if final condition is contained into matrix jj, if yes, they will be stored in matrix tt
+
+6. Get Boolean control sequences
+a) Conditional 3 checks if matrix tt is empty, if not, the information is summarized in 4 columns as follows:
+   Index zz: number of possible trajectory
+   Index i:  number of gene
+   Index i1: number of initial attractor (x0)
+   Index i2: number of final attractor   (xd)
+b) Matrix U contains all the controls for each transition
+c) Re-read the archive that contains the network. 
+ 
+
+
+  

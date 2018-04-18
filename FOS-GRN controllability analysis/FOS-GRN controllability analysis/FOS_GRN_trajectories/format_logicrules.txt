@@ -1,0 +1,22 @@
+S2 Appendix. Logic Rules of FOS-GNR for Matlab coding
+Description: The transformation of logic rules are based on the next:
+
+In cases where x(t+1)=!A(t) , it is transformed into x(t+1)=MN A (MN is a matrix related to negation)
+In cases where x(t+1)=A(t)&B(t) , it is transformed into x(t+1)= MC A B (MC is a matrix related to conjunction)
+In cases where x(t+1)=A(t)|B(t) , it is transformed into x(t+1)= MD A B (MD is a matrix related to disjunction)
+
+
+
+MD MD MD MD MC MC MN EMF1 MN TFL1 MN AP2 MC MC MN EMF1 LFY MN AP1 MC MC MN EMF1 MN AP2 LFY MC MC MC MN EMF1 MN TFL1 LFY MC AG SEP MC MN EMF1 MC LFY WUS
+MD MD MD MD MD MC MN AG MN TFL1 MC MC FT LFY MN AG MC MC FT MN AG MN PI MC MC LFY MN AG MN PI MC MC FT MN AG MN AP3 MC MC LFY MN AG MN AP3
+MN TFL1
+MD MC LFY UFO MC MC MC PI SEP AP3 MD AG AP1
+MN LFY
+MN EMF1
+MC MN AP1 MN TFL1
+MD MN EMF1 MN TFL1
+MD MC LFY MD AG AP3 MC MC MC PI SEP AP3 MD AG AP1
+LFY
+MC MN AP1 MC EMF1 MN LFY
+UFO
+MC WUS MD MN AG MN SEP
